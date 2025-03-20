@@ -195,13 +195,6 @@ end
 @everywhere active_agents(model) = length([a.id for a in allagents(model) if a.state==0])
 @everywhere mdata = [unbound_sites, active_agents]
 @everywhere adf, mdf, mds = ensemblerun!(models, agent_step!, model_step!, nsteps; mdata, parallel = true)
-@everywhere open("results.txt", "w") do io
-    println(io, "Number of occupied sites is: ",n_agents - mean(mdf[nsteps+1:nsteps+1:end, 2]), "\n")
-    println(io, "Standard Deviation is : ", std(mdf[nsteps+1:nsteps+1:end, 2]), "\n")
-    println(io, "Fraction of occupied sites is: ", 100*(n_agents - mean(mdf[nsteps+1:nsteps+1:end, 2])) / n_agents , "\n")
-    println(io, "Fraction of occupied sites is: lower ", 100*(n_agents - (mean(mdf[nsteps+1:nsteps+1:end, 2]) + std(mdf[nsteps+1:nsteps+1:end, 2]))) / n_agents , "\n")
-    println(io, "Fraction of occupied sites is: upper ", 100*(n_agents - (mean(mdf[nsteps+1:nsteps+1:end, 2]) - std(mdf[nsteps+1:nsteps+1:end, 2]))) / n_agents , "\n")
-end
 
 using CSV
 CSV.write(string(n_agents)*"agents_data.csv", mdf) 
