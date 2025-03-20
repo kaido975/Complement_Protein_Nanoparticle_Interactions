@@ -11,9 +11,6 @@ k_cat = kcat_C3bBb * C3/(km_C3bBb + C3)
 div_fac = 6
 K_mod = kf_pC3b*k_cat/kf_C3bBbC3b/div_fac
 
-# kf_C3bBbC3b = 3.5e6 * 1e-6* 60 * 3
-# kcat_C3bBbP = 3.1 * 60 * 10
-
 Na = 6.022e23 #Avagadro Number
 conc_np = 2e12/Na/1e-3 #Concentration of Nanoparticles (M)
 
