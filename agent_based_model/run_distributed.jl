@@ -31,7 +31,7 @@ end
 @everywhere cz = 0.5
 @everywhere r = 0.5
 
-#Define Boundary layer for diffusion
+#Boundary layer for diffusion
 @everywhere ϵ = 0.02
 @everywhere mask = r^2 + ϵ/10 .<= (x .- cx).^2 .+ (y .- cy).^2 .+ (z .- cz).^2 .<= r^2 + ϵ
 
@@ -55,12 +55,12 @@ end
 
 @everywhere function initialize_model(;
     seed = 42,  ## seed for random number generator,
-    walk = mask,
-    speed = 0.35,
-    dt = 0.1, 
-    k_tick = 4e-4, 
-    k_cat = 8e-2,
-    decay_time = 5.0
+    walk = mask, ## Boundary layer for agent movement
+    surface_diffusion = 0.35, #Surface Diffusion Rate
+    dt = 0.1, #Time step
+    k_tick = 4e-4, #Tickover rate
+    k_cat = 8e-2, #Autocatalysis rate
+    decay_time = 5.0 #Bound C3b time to decay
 )
    
     lps = Int.(collect(range(1, n_agents, length = n_agents)))  #Binding Sites
@@ -70,7 +70,7 @@ end
 
     properties = (
         walkable_path = AStar(space; walkmap = mask),
-        speed = speed,
+        surface_diffusion = surface_diffusion,
         dt = dt,
         k_tick  =k_tick,
         k_cat = k_cat, 
@@ -131,7 +131,7 @@ end
         if is_stationary(c3_agent, model.walkable_path)
             plan_route!(c3_agent, random_walkable(model, model.walkable_path), model.walkable_path)     
         end
-        move_along_route!(c3_agent, model, model.walkable_path, model.speed, model.dt)        
+        move_along_route!(c3_agent, model, model.walkable_path, model.surface_diffusion, model.dt)        
         return  
     else 
         if length(model.lps)==0
@@ -179,7 +179,7 @@ end
         model.agents[id].engaged = 1
         deleteat!(model.lps, findall(x->x==id, model.lps))
         id = nextid(model)
-        vel = sincos(2π * rand(model.rng)) .* model.speed
+        vel = sincos(2π * rand(model.rng)) .* model.surface_diffusion
         vel = (0,0,0)
         add_agent_pos!( c3(id, (x, y, z), 1, 0, 0) , model)
         return
@@ -187,8 +187,8 @@ end
 
 end
 
-@everywhere nsteps = 1400
-@everywhere runs = 500
+@everywhere nsteps = 1400 #Total steps
+@everywhere runs = 500 #Number of simulations
 
 @everywhere models = [initialize_model(seed = x) for x in rand(UInt16, runs)]
 @everywhere unbound_sites(model) = length(model.lps)
